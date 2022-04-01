@@ -1,46 +1,59 @@
 import { Component } from "react"
 import Text from "./Text"
-import Opcion from "./Opcion"
+import Option from "./Option"
+import LastSelected from "./LastSelected"
+import OptionHistory from "./OptionHistory"
 import data from "./data"
+import Swal from "sweetalert2";
 
 export default class Layout extends Component{
     constructor(props){
         super(props);
         this.state = {
-            idActual: 1,
-            opcionActual: ""
+            currentId: 1,
+            currentOption: "",
+            optionHistory: []
         }
-        this.nextId = this.nextId.bind(this);
-        this.setOption = this.setOption.bind(this);
+        this.advanceStory = this.advanceStory.bind(this);
     }
-    nextId(){
-        if(this.state.idActual+1 <= (data.length+1)/2){
+    advanceStory(chosenOption){
+        if(this.state.currentId+1 <= (data.length+1)/2){        
             this.setState({
-                idActual: (this.state.idActual+1)
+                currentId: (this.state.currentId+1),
+                currentOption: chosenOption,
+                optionHistory: [...this.state.optionHistory, chosenOption.toUpperCase()]
             });
         }else{
-            //Sweet alert fin
-            alert("Fin");
-        }
-    }
-    setOption(opcionElegida){
-        if(this.state.idActual+1 <= (data.length+1)/2){
-            this.setState({
-                opcionActual: opcionElegida
+            Swal.fire({
+                title: "Fin de la historia",
+                text: "Desea volver a comenzar?",
+                denyButtonText: "No",
+                showDenyButton: true,
+                confirmButtonText: "Si",
+                color: "white",
+            }).then(result => {
+                if(result.isConfirmed){
+                    this.setState({
+                        currentId: 1,
+                        currentOption: "",
+                        optionHistory: []
+                    });
+                }
             });
         }
     }
+
     render(){
         return (
             <div className="layout">
-                <Text id={this.state.idActual+this.state.opcionActual}/>
-                <div className="opciones" id={this.state.idActual} opcion={this.state.opcionActual}>
-                    <Opcion opcion="A" id={this.state.idActual+this.state.opcionActual} nextId={this.nextId} setOption={this.setOption}/>
-                    <Opcion opcion="B" id={this.state.idActual+this.state.opcionActual} nextId={this.nextId} setOption={this.setOption}/>
+                <Text id={this.state.currentId+this.state.currentOption}/>
+                <div className="opciones" id={this.state.currentId} opcion={this.state.currentOption}>
+                    <Option opcion="A" id={this.state.currentId+this.state.currentOption} advanceStory={this.advanceStory}/>
+                    <Option opcion="B" id={this.state.currentId+this.state.currentOption} advanceStory={this.advanceStory}/>
                 </div>
                 <div className="recordatorio">
-                    {/* <SelAnterior/>
-                    <Historial/> */}
+                    <LastSelected chosen={this.state.optionHistory[this.state.optionHistory.length-1]}/>
+                    <OptionHistory optionHistory={this.state.optionHistory}/>
                 </div>
             </div>
         );
