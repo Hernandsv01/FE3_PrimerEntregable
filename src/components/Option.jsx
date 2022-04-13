@@ -8,7 +8,7 @@ export default class Opcion extends Component{
     }
     handleButtonClick(e){
         e.preventDefault();
-        this.props.advanceStorygit(this.props.opcion.toLowerCase());
+        this.props.advanceStory(this.props.opcion.toLowerCase());
     }
     render(){
         return (
